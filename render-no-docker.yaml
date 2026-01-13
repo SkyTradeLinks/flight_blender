@@ -1,0 +1,115 @@
+services:
+  - type: web
+    name: flight-blender-web
+    env: python
+    buildCommand: pip install uv && uv sync --frozen --no-dev && python manage.py collectstatic --noinput && python manage.py migrate
+    startCommand: uvicorn flight_blender.asgi:application --host 0.0.0.0 --port $PORT --workers 3
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: IS_DEBUG
+        value: 0
+      - key: USE_LOCAL_SQLITE_DATABASE
+        value: 0
+      - key: ALLOWED_HOSTS
+        fromService:
+          type: web
+          name: flight-blender-web
+          property: host
+      - key: DATABASE_URL
+        fromDatabase:
+          name: flight-blender-db
+          property: connectionString
+      - key: REDIS_HOST
+        fromService:
+          type: redis
+          name: flight-blender-redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          type: redis
+          name: flight-blender-redis
+          property: port
+      - key: REDIS_PASSWORD
+        fromService:
+          type: redis
+          name: flight-blender-redis
+          property: password
+      - key: REDIS_BROKER_URL
+        fromService:
+          type: redis
+          name: flight-blender-redis
+          property: connectionString
+      - key: FLIGHTBLENDER_FQDN
+        fromService:
+          type: web
+          name: flight-blender-web
+          property: host
+      - key: HEARTBEAT_RATE_SECS
+        value: 2
+      - key: USSP_NETWORK_ENABLED
+        value: 0
+      - key: DSS_SELF_AUDIENCE
+        fromService:
+          type: web
+          name: flight-blender-web
+          property: host
+      - key: PYTHONPATH
+        value: /opt/render/project/src
+
+  - type: worker
+    name: flight-blender-worker
+    env: python
+    buildCommand: pip install uv && uv sync --frozen --no-dev
+    startCommand: celery --app=flight_blender worker --loglevel=info
+    envVars:
+      - key: SECRET_KEY
+        fromService:
+          type: web
+          name: flight-blender-web
+          property: envVar
+          value: SECRET_KEY
+      - key: IS_DEBUG
+        value: 0
+      - key: USE_LOCAL_SQLITE_DATABASE
+        value: 0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: flight-blender-db
+          property: connectionString
+      - key: REDIS_HOST
+        fromService:
+          type: redis
+          name: flight-blender-redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          type: redis
+          name: flight-blender-redis
+          property: port
+      - key: REDIS_PASSWORD
+        fromService:
+          type: redis
+          name: flight-blender-redis
+          property: password
+      - key: REDIS_BROKER_URL
+        fromService:
+          type: redis
+          name: flight-blender-redis
+          property: connectionString
+      - key: HEARTBEAT_RATE_SECS
+        value: 2
+      - key: USSP_NETWORK_ENABLED
+        value: 0
+      - key: PYTHONPATH
+        value: /opt/render/project/src
+
+  - type: redis
+    name: flight-blender-redis
+    plan: free
+
+databases:
+  - name: flight-blender-db
+    databaseName: flight_blender
+    user: flight_blender_user
+    plan: free
