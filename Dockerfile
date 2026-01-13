@@ -1,4 +1,5 @@
-FROM --platform=linux/amd64 python:3.12-slim
+# FROM --platform=linux/amd64 
+FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -17,6 +18,9 @@ COPY uv.lock pyproject.toml ./
 # Install Python dependencies
 RUN pip install -U pip && pip install uv && uv sync --frozen --no-install-project --no-dev
 
+# Set PYTHONPATH to include the current directory so Django can find the modules
+ENV PYTHONPATH=/app
+
 # Create non-root user
 RUN addgroup --gid 10000 django && adduser --shell /bin/bash --disabled-password --gecos "" --uid 10000 --ingroup django django
 
@@ -24,7 +28,7 @@ RUN addgroup --gid 10000 django && adduser --shell /bin/bash --disabled-password
 COPY --chown=django:django . .
 
 # Make entrypoint scripts executable
-RUN chmod +x entrypoints/docker-entrypoint-web.sh entrypoints/docker-entrypoint-worker.sh
+RUN chmod +x entrypoints/docker-entrypoint-web.sh entrypoints/docker-entrypoint-worker.sh entrypoints/wait_for_service.py
 
 USER django:django
 
