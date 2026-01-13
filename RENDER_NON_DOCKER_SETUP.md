@@ -206,15 +206,17 @@ For automated setup, you can use the `render-no-docker.yaml` file:
    - Verify `REDIS_HOST`, `REDIS_PORT`, and `REDIS_PASSWORD` are set
    - Ensure Redis service is running
    - Check `REDIS_BROKER_URL` format: `redis://:password@host:port/0`
+   - **SSL/rediss:// URLs**: Render's Redis uses SSL (`rediss://`). The settings automatically add `ssl_cert_reqs=CERT_NONE` to the URL for Celery compatibility
 
 5. **Static Files Not Loading**
    - Verify `collectstatic` runs in build command
    - Check `STATIC_URL` setting in Django settings
    - Ensure static files are being served correctly
 
-6. **Worker Not Processing Tasks**
+6. **Worker Not Processing Tasks / Celery SSL Error**
    - Verify worker service is running
    - Check that `REDIS_BROKER_URL` matches in both web and worker services
+   - If you see `ssl_cert_reqs` error with `rediss://` URLs, ensure settings.py includes the SSL fix (automatically adds `ssl_cert_reqs=CERT_NONE`)
    - Review worker logs for errors
 
 7. **Port Binding Issues**

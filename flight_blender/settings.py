@@ -158,6 +158,12 @@ if DEBUG:
 else:
     BROKER_URL = os.getenv("REDIS_BROKER_URL", "redis://redis:6379/")
 
+# Fix for Render.com Redis SSL: Celery requires ssl_cert_reqs parameter for rediss:// URLs
+if BROKER_URL.startswith("rediss://") and "ssl_cert_reqs" not in BROKER_URL:
+    # Add ssl_cert_reqs parameter if not present
+    separator = "&" if "?" in BROKER_URL else "?"
+    BROKER_URL = f"{BROKER_URL}{separator}ssl_cert_reqs=CERT_NONE"
+
 
 CHANNEL_LAYERS = {
     "default": {
