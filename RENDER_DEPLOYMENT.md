@@ -86,7 +86,10 @@ DATABASE_URL=postgresql://user:password@hostname:5432/database_name
 REDIS_HOST=your-redis-host.onrender.com
 REDIS_PORT=6379
 REDIS_PASSWORD=your-redis-password
+# IMPORTANT: Use 'rediss://' (with double 's') if your Redis requires SSL/TLS
+# For CloudClusters or other SSL-enabled Redis, use: rediss://username:password@host:port
 REDIS_BROKER_URL=redis://:password@your-redis-host.onrender.com:6379/0
+# Example with SSL: REDIS_BROKER_URL=rediss://flight_blender:password@redis-host.com:10023
 
 # Application Settings
 FLIGHTBLENDER_FQDN=https://your-app-name.onrender.com
@@ -293,6 +296,10 @@ Then deploy via:
    - Verify `REDIS_HOST`, `REDIS_PORT`, and `REDIS_PASSWORD` are set
    - Ensure Redis service is running
    - Check `REDIS_BROKER_URL` format: `redis://:password@host:port/0`
+   - **If using SSL/TLS**: Use `rediss://` (with double 's') instead of `redis://`
+   - **For CloudClusters or non-standard ports**: The entrypoint script will auto-detect SSL requirement
+   - Check logs for "Detected SSL requirement" message
+   - If connection keeps failing, verify your Redis provider requires SSL and update `REDIS_BROKER_URL` accordingly
 
 3. **Static Files Not Loading**
    - Static files are automatically collected by the Docker entrypoint script
