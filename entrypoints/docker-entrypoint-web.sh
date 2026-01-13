@@ -1,6 +1,15 @@
 #!/bin/bash
 set -e
 
+# Determine Python command - prefer uv run, fallback to venv python
+if command -v uv &> /dev/null; then
+    PYTHON_CMD="uv run python"
+elif [ -f ".venv/bin/python" ]; then
+    PYTHON_CMD=".venv/bin/python"
+else
+    PYTHON_CMD="python"
+fi
+
 echo "Waiting for services..."
 
 # Wait for Redis
@@ -35,7 +44,7 @@ if [ -n "$REDIS_HOST" ]; then
   MAX_ATTEMPTS=30
   ATTEMPT=0
   
-  until python -c "
+  until ${PYTHON_CMD} -c "
 import redis
 import sys
 import os
@@ -88,7 +97,7 @@ fi
 # Wait for PostgreSQL
 if [ -n "$DATABASE_URL" ] || [ -n "$POSTGRES_HOST" ]; then
   echo "Waiting for PostgreSQL..."
-  until python -c "
+  until ${PYTHON_CMD} -c "
 import sys
 try:
     if '${DATABASE_URL}':
@@ -122,12 +131,16 @@ echo "All services are ready!"
 
 # Collect static files
 echo "Collecting static files..."
-python manage.py collectstatic --noinput || echo "Warning: Static files collection failed, continuing..."
+${PYTHON_CMD} manage.py collectstatic --noinput || echo "Warning: Static files collection failed, continuing..."
 
 # Apply database migrations
 echo "Applying database migrations..."
-python manage.py migrate || echo "Warning: Migrations failed, continuing..."
+${PYTHON_CMD} manage.py migrate || echo "Warning: Migrations failed, continuing..."
 
 # Start server
 echo "Starting server on port ${PORT:-8000}..."
-exec uvicorn flight_blender.asgi:application --host 0.0.0.0 --port ${PORT:-8000} --workers 3
+if command -v uv &> /dev/null; then
+    exec uv run uvicorn flight_blender.asgi:application --host 0.0.0.0 --port ${PORT:-8000} --workers 3
+else
+    exec ${PYTHON_CMD} -m uvicorn flight_blender.asgi:application --host 0.0.0.0 --port ${PORT:-8000} --workers 3
+fi

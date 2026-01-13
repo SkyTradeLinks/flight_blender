@@ -1,6 +1,15 @@
 #!/bin/bash
 set -e
 
+# Determine Python command - prefer uv run, fallback to venv python
+if command -v uv &> /dev/null; then
+    PYTHON_CMD="uv run python"
+elif [ -f ".venv/bin/python" ]; then
+    PYTHON_CMD=".venv/bin/python"
+else
+    PYTHON_CMD="python"
+fi
+
 # Wait for Redis
 if [ -n "$REDIS_HOST" ]; then
   echo "Waiting for Redis at ${REDIS_HOST}:${REDIS_PORT:-6379}..."
@@ -33,7 +42,7 @@ if [ -n "$REDIS_HOST" ]; then
   MAX_ATTEMPTS=30
   ATTEMPT=0
   
-  until python -c "
+  until ${PYTHON_CMD} -c "
 import redis
 import sys
 import os
@@ -87,4 +96,8 @@ fi
 
 # Start Celery worker
 echo "Starting Celery worker..."
-exec celery --app=flight_blender worker --loglevel=info
+if command -v uv &> /dev/null; then
+    exec uv run celery --app=flight_blender worker --loglevel=info
+else
+    exec ${PYTHON_CMD} -m celery --app=flight_blender worker --loglevel=info
+fi

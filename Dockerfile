@@ -11,14 +11,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy dependency files
-COPY uv.lock pyproject.toml ./
-
-# Install Python dependencies
-RUN pip install -U pip && pip install uv && uv sync --frozen --no-install-project --no-dev
+# Install uv system-wide
+RUN pip install -U pip && pip install uv
 
 # Create non-root user
 RUN addgroup --gid 10000 django && adduser --shell /bin/bash --disabled-password --gecos "" --uid 10000 --ingroup django django
+
+# Copy dependency files
+COPY --chown=django:django uv.lock pyproject.toml ./
+
+# Install Python dependencies as django user (creates .venv owned by django)
+USER django:django
+RUN uv sync --frozen --no-install-project --no-dev
 
 # Copy application code
 COPY --chown=django:django . .
