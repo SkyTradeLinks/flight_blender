@@ -57,6 +57,14 @@ Follow our simple 5-step guide to deploy Flight Blender and explore its core fea
 📖 [Read the 20-minute quickstart guide](deployment_support/README.md) to get started now!
 
 ---
+
+## 🚀 Deploy to Render.com
+
+Deploy Flight Blender to Render.com with our comprehensive deployment guide.
+
+📖 [Read the Render.com deployment guide](RENDER_DEPLOYMENT.md) for step-by-step instructions!
+
+---
 ## 💫 Join the community
 [Discord](https://discord.gg/dnRxpZdd9a)
 
