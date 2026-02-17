@@ -18,12 +18,14 @@ services:
     container_name: "db-blender"
     image: postgres:17
     ports:
-      - "5433:5432"   # Host port 5433, container port 5432
+      - "5433:5433"   # Host port 5433, container port 5433
     expose:
-      - "5432"
+      - "5433"
     restart: unless-stopped
     volumes:
       - db_data:/var/lib/postgresql/data/
+    environment:
+      - PGPORT=5433
     env_file:
       - ".env"
     networks:

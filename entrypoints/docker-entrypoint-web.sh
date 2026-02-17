@@ -16,7 +16,7 @@ fi
 # Wait for PostgreSQL
 if [ -n "$DATABASE_URL" ] || [ -n "$POSTGRES_HOST" ]; then
   echo "Waiting for PostgreSQL..."
-  POSTGRES_PORT=${POSTGRES_PORT:-5432}
+  POSTGRES_PORT=${POSTGRES_PORT:-5433}
   if [ -n "$DATABASE_URL" ]; then
     # Extract host and port from DATABASE_URL
     DB_HOST=$(echo $DATABASE_URL | sed -E 's|.*@([^:]+):.*|\1|')
