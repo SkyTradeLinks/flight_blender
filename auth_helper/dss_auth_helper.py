@@ -94,8 +94,9 @@ class AuthorityCredentialsGetter:
         scopes_str = " ".join(scopes)
 
         auth_server_url = env.get("DSS_AUTH_URL", "http://host.docker.internal:8085") + env.get("DSS_AUTH_TOKEN_ENDPOINT", "/auth/token")
+        use_dummy_oauth = env.get("DSS_USE_DUMMY_OAUTH", "0").lower() in ("1", "true", "yes")
 
-        if auth_server_url.startswith("http://local_"):
+        if use_dummy_oauth or auth_server_url.startswith("http://local_"):
             payload = {
                 "grant_type": "client_credentials",
                 "intended_audience": env.get("DSS_SELF_AUDIENCE"),

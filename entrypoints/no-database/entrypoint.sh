@@ -5,9 +5,13 @@ if ! uv run python entrypoints/wait_for_service.py --service $REDIS_HOST:$REDIS_
     exit 1
 fi
 
+# Sync dependencies (ensures newly added packages are installed)
+echo "Syncing dependencies..."
+uv sync --frozen --no-dev
+
 # Collect static files
-#echo "Collect static files"
-#uv run python manage.py collectstatic --noinput
+echo "Collect static files"
+uv run python manage.py collectstatic --noinput
 
 # Apply database migrations
 echo "Apply database migrations"

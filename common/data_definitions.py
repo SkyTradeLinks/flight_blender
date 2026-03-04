@@ -56,6 +56,7 @@ USS_AVAILABILITY = (
 
 # When an operator changes a state, he / she puts a new state (via the API), this object specifies the event when a operator takes action
 OPERATOR_EVENT_LOOKUP = {
+    1: "dss_accepts",
     5: "operator_confirms_ended",
     2: "operator_activates",
     4: "operator_initiates_contingent",

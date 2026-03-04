@@ -221,6 +221,29 @@ celery -A flight_blender worker -l info
 celery -A flight_blender beat -l info
 ```
 
+### Deploy on Render (Standalone)
+
+Flight Blender includes Render blueprints for standalone deployments.
+
+#### Option A: Docker (recommended for parity)
+1. In Render, create a **New Blueprint** and point it to this repo.
+2. Select `render.yaml`.
+3. Render will provision:
+   - Web service (`flight-blender-web`)
+   - Worker (`flight-blender-worker`)
+   - Redis
+   - Postgres
+4. Set/override required env vars (see `env.template`), especially:
+   - `PASSPORT_URL`, `PASSPORT_AUDIENCE`, `BYPASS_AUTH_TOKEN_VERIFICATION=0`
+   - `ALLOWED_HOSTS` to your Render host
+5. Deploy. The web service will be reachable at your Render URL.
+
+#### Option B: Non-Docker Python
+1. In Render, create a **New Blueprint** and point it to this repo.
+2. Select `render-no-docker.yaml`.
+3. Render will provision the same services using Python build/start commands.
+4. Set/override required env vars as above.
+
 ### Troubleshooting
 
 **Issue: Port conflicts**

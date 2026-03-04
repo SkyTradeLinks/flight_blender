@@ -65,6 +65,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -98,7 +99,7 @@ ASGI_APPLICATION = "flight_blender.asgi.application"
 
 
 DATABASES = {}
-USE_LOCAL_SQLITE_DATABASE = os.getenv("USE_LOCAL_SQLITE_DATABASE", 0)
+USE_LOCAL_SQLITE_DATABASE = int(os.getenv("USE_LOCAL_SQLITE_DATABASE", 0))
 if USE_LOCAL_SQLITE_DATABASE:
     DATABASES = {
         "default": {
@@ -152,6 +153,12 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.getenv("STATIC_ROOT", BASE_DIR / "staticfiles")
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 if DEBUG:

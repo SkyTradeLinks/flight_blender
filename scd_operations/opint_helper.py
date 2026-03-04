@@ -38,6 +38,9 @@ class DSSOperationalIntentsCreator:
 
     def validate_flight_declaration_start_end_time(self) -> bool:
         flight_declaration = self.my_database_reader.get_flight_declaration_by_id(flight_declaration_id=self.flight_declaration_id)
+        if not flight_declaration:
+            logger.error(f"Flight Declaration with ID {self.flight_declaration_id} not found in database, cannot validate start/end time")
+            return False
         # check that flight declaration start and end time is in the next two hours
         now = arrow.now()
         two_hours_from_now = now.shift(hours=2)
