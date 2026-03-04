@@ -3564,11 +3564,13 @@ components:
     FlightDeclarationStateOperatorUpdateEnum:
           type: integer
           enum:
+          - 1
           - 2
           - 3
           - 5
           description: >
             The state of the operation
+             * `1` - Accepted
              * `2` - Activated
              * `3` - Nonconforming
              * `5` - Ended

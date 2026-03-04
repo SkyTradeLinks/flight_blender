@@ -290,7 +290,9 @@ def set_operational_intent(request):
         )
     else:
         if declaration_state == 0 and USSP_NETWORK_ENABLED:
-            submit_flight_declaration_to_dss_async.delay(flight_declaration_id=flight_declaration_id)
+            from django.db import transaction
+
+            transaction.on_commit(lambda: submit_flight_declaration_to_dss_async.delay(flight_declaration_id=flight_declaration_id))
 
     creation_response = FlightDeclarationCreateResponse(
         id=flight_declaration_id,
@@ -398,7 +400,9 @@ def set_flight_declaration(request):
         )
     else:
         if declaration_state == 0 and USSP_NETWORK_ENABLED:
-            submit_flight_declaration_to_dss_async.delay(flight_declaration_id=flight_declaration_id)
+            from django.db import transaction
+
+            transaction.on_commit(lambda: submit_flight_declaration_to_dss_async.delay(flight_declaration_id=flight_declaration_id))
 
     creation_response = FlightDeclarationCreateResponse(
         id=flight_declaration_id,
@@ -688,7 +692,9 @@ class FlightDeclarationCreateList(mixins.ListModelMixin, generics.GenericAPIView
             )
         else:
             if declaration_state == 0 and USSP_NETWORK_ENABLED:
-                submit_flight_declaration_to_dss_async.delay(flight_declaration_id=flight_declaration_id)
+                from django.db import transaction
+
+                transaction.on_commit(lambda: submit_flight_declaration_to_dss_async.delay(flight_declaration_id=flight_declaration_id))
 
         creation_response = FlightDeclarationCreateResponse(
             id=flight_declaration_id,

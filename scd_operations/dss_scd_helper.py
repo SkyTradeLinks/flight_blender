@@ -705,7 +705,7 @@ class OperationalIntentReferenceHelper:
 
 class SCDOperations:
     def __init__(self):
-        self.dss_base_url = env.get("DSS_BASE_URL", "0")
+        self.dss_base_url = env.get("DSS_BASE_URL", "0").rstrip("/") + "/"
         self.r = get_redis()
         self.database_reader = FlightBlenderDatabaseReader()
         self.database_writer = FlightBlenderDatabaseWriter()
@@ -838,6 +838,8 @@ class SCDOperations:
                                 uss_op_int_id=current_uss_operational_intent_detail.id
                             )
                         )
+                        op_int_details_retrieved = False
+                        continue
                     op_int_details_retrieved = True
 
                 else:  # This operational intent details is from a peer uss, need to query peer USS

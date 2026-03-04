@@ -2,6 +2,7 @@ import hashlib
 import json
 import time
 import uuid
+import dataclasses
 from dataclasses import asdict
 from datetime import timedelta
 from typing import Any
@@ -71,6 +72,8 @@ class RIDOutputHelper:
     def make_json_compatible(self, struct: Any) -> Any:
         if isinstance(struct, tuple) and hasattr(struct, "_asdict"):
             return {k: self.make_json_compatible(v) for k, v in struct._asdict().items()}
+        elif dataclasses.is_dataclass(struct) and not isinstance(struct, type):
+            return {k: self.make_json_compatible(v) for k, v in asdict(struct).items()}
         elif isinstance(struct, dict):
             return {k: self.make_json_compatible(v) for k, v in struct.items()}
         elif isinstance(struct, str):
@@ -116,8 +119,7 @@ class SubscriptionsHelper:
             subscription_duration_seconds=subscription_duration_seconds,
             is_simulated=is_simulated,
         )
-        subscription_response = self.my_rid_output_helper.make_json_compatible(subscription_r)
-        return subscription_response
+        return subscription_r
 
     def start_ussp_polling(self):
         """

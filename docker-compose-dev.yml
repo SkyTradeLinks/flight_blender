@@ -11,23 +11,25 @@ services:
     container_name: "redis-blender"
     env_file:
       - ".env"
-    # networks:
-    #   - interop_ecosystem_network
+    networks:
+      - interop_ecosystem_network
   db-blender:
     platform: linux/amd64
     container_name: "db-blender"
     image: postgres:17
+    environment:
+      - PGPORT=5433
     ports:
-      - "5432:5432"
+      - "5433:5433"
     expose:
-      - "5432"
+      - "5433"
     restart: unless-stopped
     volumes:
       - db_data:/var/lib/postgresql/data/
     env_file:
       - ".env"
-    # networks:
-    #   - interop_ecosystem_network
+    networks:
+      - interop_ecosystem_network
 
   flight-blender:
     platform: linux/amd64
@@ -48,8 +50,8 @@ services:
       - db-blender
     # volumes:
     #   - .:/app
-    # networks:
-    #   - interop_ecosystem_network
+    networks:
+      - interop_ecosystem_network
 
 
   flight-blender-celery:
@@ -66,8 +68,8 @@ services:
     #   - .:/app
     depends_on:
       - redis-blender
-    # networks:
-    #   - interop_ecosystem_network
+    networks:
+      - interop_ecosystem_network
 
   flight-blender-celery-beat:
     platform: linux/amd64
@@ -90,13 +92,13 @@ services:
         condition: service_started
       flight-blender-celery:
         condition: service_started
-  #   networks:
-  #     - interop_ecosystem_network
+    networks:
+      - interop_ecosystem_network
 
 volumes:
   app:
   db_data:
 
-# networks:
-#   interop_ecosystem_network:
-#     external: true
+networks:
+  interop_ecosystem_network:
+    external: true

@@ -65,6 +65,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -98,7 +99,7 @@ ASGI_APPLICATION = "flight_blender.asgi.application"
 
 
 DATABASES = {}
-USE_LOCAL_SQLITE_DATABASE = os.getenv("USE_LOCAL_SQLITE_DATABASE", 0)
+USE_LOCAL_SQLITE_DATABASE = int(os.getenv("USE_LOCAL_SQLITE_DATABASE", 0))
 if USE_LOCAL_SQLITE_DATABASE:
     DATABASES = {
         "default": {
@@ -151,12 +152,25 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = "/static/"
+STATIC_ROOT = os.getenv("STATIC_ROOT", BASE_DIR / "staticfiles")
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 if DEBUG:
     BROKER_URL = os.getenv("REDIS_BROKER_URL", "redis://localhost:6379/")
 else:
     BROKER_URL = os.getenv("REDIS_BROKER_URL", "redis://redis:6379/")
+
+# Fix for Render.com Redis SSL: Celery requires ssl_cert_reqs parameter for rediss:// URLs
+if BROKER_URL.startswith("rediss://") and "ssl_cert_reqs" not in BROKER_URL:
+    # Add ssl_cert_reqs parameter if not present
+    separator = "&" if "?" in BROKER_URL else "?"
+    BROKER_URL = f"{BROKER_URL}{separator}ssl_cert_reqs=CERT_NONE"
 
 
 CHANNEL_LAYERS = {

@@ -70,7 +70,7 @@ geod = Geod(ellps="WGS84")
 
 class RemoteIDOperations:
     def __init__(self):
-        self.dss_base_url = env.get("DSS_BASE_URL", "000")
+        self.dss_base_url = env.get("DSS_BASE_URL", "000").rstrip("/") + "/"
         self.r = get_redis()
 
     def compute_polygon_area(self, polygon: Polygon):

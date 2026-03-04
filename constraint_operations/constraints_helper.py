@@ -27,7 +27,7 @@ from loguru import logger
 
 class USSConstraintsOperations:
     def __init__(self):
-        self.dss_base_url = env.get("DSS_BASE_URL", "0")
+        self.dss_base_url = env.get("DSS_BASE_URL", "0").rstrip("/") + "/"
         self.r = get_redis()
         self.database_reader = FlightBlenderDatabaseReader()
         self.database_writer = FlightBlenderDatabaseWriter()

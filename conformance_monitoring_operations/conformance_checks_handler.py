@@ -81,9 +81,11 @@ class FlightOperationConformanceHelper:
 
         my_operation_state_machine = FlightOperationStateMachine(state=original_state)
         logger.info("Current Operation State %s" % my_operation_state_machine.state)
+        logger.info("Attempting transition: state %s -> %s via event '%s'" % (original_state, new_state, event))
 
         my_operation_state_machine.on_event(event)
         changed_state = get_status(my_operation_state_machine.state)
+        logger.info("State after event: %s (int: %s), expected: %s" % (my_operation_state_machine.state, changed_state, new_state))
         if changed_state == new_state:
             return True
         else:
